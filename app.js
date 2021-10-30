@@ -211,7 +211,7 @@ function execute() {
   
     switch(e.key) { // caso a seta mover pra cima seja pressionada
       case 'ArrowUp':
-        laserId = setInterval(moveLaser, 150) // faz a movimentação do laser
+        laserId = setInterval(moveLaser, 100) // faz a movimentação do laser
     }
   }
   
