@@ -218,3 +218,25 @@ function execute() {
   document.addEventListener('keydown', shoot) // listerner para ouvir botão de seta 
 }
 
+function save() {
+  const name = window.prompt("enter the name of your save");
+
+  if(name === null) {
+    return;
+  }
+
+  let scoreboard = localStorage.getItem("placar");
+
+  if(scoreboard === null){
+    scoreboard = [];
+  } else {
+    scoreboard = JSON.parse(scoreboard);
+  }
+
+  scoreboard.push({
+    name,
+    result: results
+  });
+
+  localStorage.setItem("placar", JSON.stringify(scoreboard));
+}

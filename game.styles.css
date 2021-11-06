@@ -92,3 +92,18 @@ section h1 {
 .restart {
   background-color: rgb(190, 53, 53);
 }
+
+.scoreboard {
+  display: block;
+  width: 300px;
+  padding: 10px;
+  margin-top: 5px;
+  border: 0;
+  color: white;
+
+  font-weight: bold;
+  font-size: 15px;
+
+  cursor: pointer;
+  background-color: rgb(88, 88, 88);
+}
