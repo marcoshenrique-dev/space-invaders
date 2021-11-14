@@ -1,39 +1,41 @@
-/*
+
+const canvas = document.querySelector('.canvas');
+const telaDerResultados = document.querySelector('.pontos');
+const botaoInicio = document.querySelector('.comecar');
+
+let posicaoDoAtirador = 202; 
+let altura = 15;
+let direcao = 1;
+let iniciado = false;
+
+
+let posicaoAliens;
+let aliensAcertados = [];
+
+
   
-  GAME
-  usando js puro sem libs
+const aliens = [
+  0,1,2,3,4,5,6,7,8,9,
+  15,16,17,18,19,20,21,22,23,24,
+  30,31,32,33,34,35,36,37,38,39
+]
 
-  baseado no vídeo: https://www.youtube.com/watch?v=3Nz4Yp7Y_uA
-
-*/
-
-// variáveis de elementos
-
-const grid = document.querySelector('.grid');
-const resultsDisplay = document.querySelector('.points');
-const buttonStart = document.querySelector('.start');
-
-// variáveis lógicas
-
-let currentShooterIndex = 202; // posição do atirador no canvas
-let width = 15;
-let direction = 1;
-let goingRight = true;
-let started = false;
+let pontos = 0;
 
 
-let invadersId;
-let aliensRemoved = [];
-let results = 0;
 
-buttonStart.innerHTML = 'START THE GAME';
 
-function start() {
-  if(started) {
-   const response = window.confirm('you will lose your progress, do you want to continue?');
+// --- funções externas
+
+function comecar() {
+
+  if(iniciado) {
+   const resposta = window.confirm('você irá perder seu progresso, deseja continuar ?');
    
-    if(response === true) {
+    if(resposta === true) {
+
       location.reload();
+
     }
     else {
       return;
@@ -41,202 +43,172 @@ function start() {
 
     
   } else {
-    execute();
+    
+    executar();
+  }
+
+}
+
+function posionarAliens(parametro) {
+  for(let i = 0; i < aliens.length; i ++) {
+
+    if(!aliensAcertados.includes(i)) { 
+
+      parametro[aliens[i]].classList.add('alien'); 
+
+    }
+   
   }
 }
 
-function execute() {  
+  
+function remover(parametro) {
+  for(let i = 0; i < aliens.length; i ++) {
+    parametro[aliens[i]].classList.remove('alien'); 
+  }
+}
+ 
+function salvar() {
+  const nome = window.prompt("coloque um nome para seu save");
 
-  started = true;
+  if(nome === null) {
+    return;
+  }
 
-  buttonStart.innerHTML = 'RESTART GAME'
-  buttonStart.classList.add('restart')
+  let placar = localStorage.getItem("placar");
+
+  if(placar === null){
+    placar = [];
+  } else {
+    placar = JSON.parse(placar);
+  }
+
+  placar.push({
+    nome,
+    resultado: pontos
+  });
+
+  localStorage.setItem("placar", JSON.stringify(placar));
+}
+
+
+// --------------------
+
+
+// função de execução
+
+function executar() {  
+
+  iniciado = true;
+
+  botaoInicio.innerHTML = 'REINICIAR JOGO'
+  botaoInicio.classList.add('reiniciar')
 
   for(let i = 0; i < 225; i++) {
     const square = document.createElement('div');
-    grid.appendChild(square)
+    canvas.appendChild(square)
   }
+
+  const aliensEmTela = Array.from(document.querySelectorAll('.canvas div'));
   
-  // Adicionando os quadrados a um array
+ 
+  posionarAliens(aliensEmTela);
   
-  const squares = Array.from(document.querySelectorAll('.grid div'));
+  aliensEmTela[posicaoDoAtirador].classList.add('nave'); 
+
+  function moverNave(e) {
+    aliensEmTela[posicaoDoAtirador].classList.remove('nave'); 
   
-  // Desenhando invaders em tela a partir das posições iniciais
-  
-  const alienInvaders = [
-    0,1,2,3,4,5,6,7,8,9,
-    15,16,17,18,19,20,21,22,23,24,
-    30,31,32,33,34,35,36,37,38,39
-  ]
-  
-  function draw() {
-    for(let i = 0; i < alienInvaders.length; i ++) {
-  
-      if(!aliensRemoved.includes(i)) { // se o alien não tiver sido removido
-  
-        squares[alienInvaders[i]].classList.add('invader'); // transforma em um invasor com a classe (css)
-  
-      }
-     
-    }
-  }
-  
-  draw(); // desenha inicialmente
-  
-  squares[currentShooterIndex].classList.add('shooter'); // adicionando a class do personagem (nave)
-  
-  // Removendo os aliens atingidos
-  
-  function remove() {
-    for(let i = 0; i < alienInvaders.length; i ++) {
-      squares[alienInvaders[i]].classList.remove('invader'); //removendo a classe de invasor (css)
-    }
-  }
-  
-  
-  
-  
-  // Criando movimentação do personagem
-  
-  function moveShooter(e) {
-    squares[currentShooterIndex].classList.remove('shooter'); // removendo personagem para não repetir na tela
-  
-    switch(e.key) { // validando a tecla que foi pressionada
+    switch(e.key) { 
       case 'ArrowLeft':
-        if(currentShooterIndex % width !== 0) currentShooterIndex -=1 // movendo a posição para esquerda
+        if(posicaoDoAtirador % altura !== 0) posicaoDoAtirador -=1
         break;
       case 'ArrowRight': 
-        if(currentShooterIndex % width < width -1) currentShooterIndex +=1 // movendo a posição para direita
+        if(posicaoDoAtirador % altura < altura -1) posicaoDoAtirador +=1 
         break;
     }
   
-    squares[currentShooterIndex].classList.add('shooter'); // adicionando a classe com a posição atual
+    aliensEmTela[posicaoDoAtirador].classList.add('nave');
   
   }
+
+  function tiro(e) { 
+    let posicaoLaser;
+    let posicaoDoLaser = posicaoDoAtirador; 
   
-  document.addEventListener('keydown', moveShooter) // criando listener que vai ouvir as teclas
+    function moveLaser() { 
   
-  
-  // Função de movimentação dos invasores
-  
-  function moveInvaders() {
-    const leftEdge = alienInvaders[0] % width === 0; // buscando a borda esquerda
-  
-    console.log(alienInvaders[alienInvaders.length - 1] % width);
-  
-    const rightEdge = alienInvaders[alienInvaders.length - 1] % width === width - 1; // busca a borda direita com a distância 
-    
-    remove(); // limpar invaders
-  
-    if(rightEdge && goingRight) { // se estiver no lado direito e indo para direita
-      for(let i = 0; i < alienInvaders.length; i++) {
-        alienInvaders[i] += width +1;
-        direction = -1;
-        goingRight = false;
-      }
-    }
-  
-    if(leftEdge && !goingRight) { // se estiver no lado esquerdo indo para esquerda
-      for(let i = 0; i < alienInvaders.length; i++) {
-        alienInvaders[i] += width;
-        direction = 1;
-        goingRight = true;
-      }
-    }
-  
-    for(let i = 0; i < alienInvaders.length; i++) { // movendo os aliens
-      alienInvaders[i] += direction
-    }
-  
-    draw(); // desenhando aliens na tela
-  
-    if(squares[currentShooterIndex].classList.contains('invader', 'shooter')) { // se chegar no index shooter e conter invader quer dizer que ouve a colisão
-  
-      resultsDisplay.innerHTML = 'GAME OVER'
-      clearInterval(invadersId); // limpa o tempo de descida dos invaders
-    }
-  
-    for(let i = 0; i < alienInvaders.length; i ++) { // caso os invaders passem da borda
-      if(alienInvaders[i] > (squares.length)) {
-        resultsDisplay.innerHTML = 'GAME OVER'
-        clearInterval(invadersId)
-      }
-    }
-  
-    if(aliensRemoved.length === alienInvaders.length) { // valida se venceu
-      resultsDisplay.innerHTML = 'YOU WIN'
-      clearInterval(invadersId)
-    }
-  }
-  
-  invadersId = setInterval(moveInvaders, 500) // define tem de movimentação dos invadores
-  
-  // Função de tiro
-  
-  function shoot(e) { 
-    let laserId;
-    let currentLaserIndex = currentShooterIndex; // posição inicial do tiro
-  
-    function moveLaser() { // funçào de mover o laser
-  
-      if (currentLaserIndex < width){ // codigo que evita erros no console
-        squares[currentLaserIndex].classList.remove('laser')
-        clearInterval(laserId)
+      if (posicaoDoLaser < altura){ 
+        aliensEmTela[posicaoDoLaser].classList.remove('laser')
+        clearInterval(posicaoLaser)
         return
       }
   
-      squares[currentLaserIndex].classList.remove('laser'); // removendo tiro
-      currentLaserIndex -= width; // definindo posição do tiro para cima
-      squares[currentLaserIndex].classList.add('laser'); // adicionando classe do tiro
+      aliensEmTela[posicaoDoLaser].classList.remove('laser'); 
+      posicaoDoLaser -= altura; 
+      aliensEmTela[posicaoDoLaser].classList.add('laser');
   
-      if(squares[currentLaserIndex].classList.contains('invader')) { // validando se o tiro colidiu com o invasor
+      if(aliensEmTela[posicaoDoLaser].classList.contains('alien')) { 
   
-        squares[currentLaserIndex].classList.remove('laser'); // remove laser
-        squares[currentLaserIndex].classList.remove('invader'); // remove invasor
-        squares[currentLaserIndex].classList.add('boom'); // cria efeito de explosão
+        aliensEmTela[posicaoDoLaser].classList.remove('laser'); 
+        aliensEmTela[posicaoDoLaser].classList.remove('alien'); 
+        aliensEmTela[posicaoDoLaser].classList.add('explosao'); 
   
-        setTimeout(() => squares[currentLaserIndex].classList.remove('boom'), 300); // define o tempo da explosão
-        clearInterval(laserId);
+        setTimeout(() => aliensEmTela[posicaoDoLaser].classList.remove('explosao'), 300);
+        clearInterval(posicaoLaser);
   
-        const alienRemoved = alienInvaders.indexOf(currentLaserIndex); // remove alien 
-        aliensRemoved.push(alienRemoved); // altera estado
-        results++; // soma placar
-        resultsDisplay.innerHTML = results; // mostra novo placar
-  
+        const alienRemovido = aliens.indexOf(posicaoDoLaser); 
+        aliensAcertados.push(alienRemovido); 
+        pontos++;
+        telaDerResultados.innerHTML = pontos; 
   
       }
       
   
     }
   
-    switch(e.key) { // caso a seta mover pra cima seja pressionada
+    switch(e.key) { 
       case 'ArrowUp':
-        laserId = setInterval(moveLaser, 100) // faz a movimentação do laser
+        posicaoLaser = setInterval(moveLaser, 100) 
     }
   }
+
+
+function moverAliens() {
   
-  document.addEventListener('keydown', shoot) // listerner para ouvir botão de seta 
+  remover(aliensEmTela); 
+
+  for(let i = 0; i < aliens.length; i++) {
+    aliens[i] += direcao
+  }
+
+  posionarAliens(aliensEmTela); 
+
+  if(aliensEmTela[posicaoDoAtirador].classList.contains('alien', 'nave')) { 
+
+    telaDerResultados.innerHTML = 'GAME OVER'
+    clearInterval(posicaoAliens); 
+
+  }
+
+  for(let i = 0; i < aliens.length; i ++) {
+    if(aliens[i] > (aliensEmTela.length)) {
+      telaDerResultados.innerHTML = 'GAME OVER'
+      clearInterval(posicaoAliens)
+    }
+  }
+
+  if(aliensAcertados.length === aliens.length) { 
+    telaDerResultados.innerHTML = 'VOCÊ VENCEU!'
+    clearInterval(posicaoAliens)
+  }
 }
 
-function save() {
-  const name = window.prompt("enter the name of your save");
+  document.addEventListener('keydown', moverNave) 
+  
+  
+  posicaoAliens = setInterval(moverAliens, 200)
 
-  if(name === null) {
-    return;
-  }
-
-  let scoreboard = localStorage.getItem("placar");
-
-  if(scoreboard === null){
-    scoreboard = [];
-  } else {
-    scoreboard = JSON.parse(scoreboard);
-  }
-
-  scoreboard.push({
-    name,
-    result: results
-  });
-
-  localStorage.setItem("placar", JSON.stringify(scoreboard));
+  
+  document.addEventListener('keydown', tiro) 
 }
