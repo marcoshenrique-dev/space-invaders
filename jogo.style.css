@@ -23,7 +23,7 @@ section h1 {
 }
 
 
-.grid {
+.canvas {
   width: 300px;
   height: 300px;
 
@@ -33,48 +33,13 @@ section h1 {
   flex-wrap: wrap;
 }
 
-.grid div {
+.canvas div {
   width: 20px;
   height: 20px;
 
 }
 
-.invader {
- 
-  background-position: center;
-  background-size: contain;
-  padding: 1px;
-  box-sizing: border-box;
-  
-  background-repeat: no-repeat;
-  background-image: url('https://images.emojiterra.com/openmoji/v12.2/512px/1f47e.png');
-  
-}
-
-.shooter {
-  background-position: center;
-  background-size: contain;
-  /* padding: 1px;
-  box-sizing: border-box; */
-  
-  background-repeat: no-repeat;
-  background-image: url('https://raw.githubusercontent.com/DamirSvrtan/space-invaders.rb/master/assets/images/Ship.png');
-}
-
-.laser {
-  background-color: orange;
-  border-radius: 2px;
-}
-
-.boom {
-  background-color: red;
-}
-
-.points {
-  color: rgb(53, 190, 53);
-}
-
-.start {
+.comecar {
   margin-top: 15px;
   width: 300px;
   padding: 10px;
@@ -89,11 +54,11 @@ section h1 {
   cursor: pointer;
 }
 
-.restart {
+.reiniciar {
   background-color: rgb(190, 53, 53);
 }
 
-.scoreboard {
+.placar {
   display: block;
   width: 300px;
   padding: 10px;
@@ -107,3 +72,38 @@ section h1 {
   cursor: pointer;
   background-color: rgb(88, 88, 88);
 }
+
+.pontos {
+  color: rgb(53, 190, 53);
+}
+
+.alien {
+ 
+  background-position: center;
+  background-size: contain;
+  padding: 1px;
+  box-sizing: border-box;
+  
+  background-repeat: no-repeat;
+  background-image: url('https://images.emojiterra.com/openmoji/v12.2/512px/1f47e.png');
+  
+}
+
+.nave {
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-image: url('https://raw.githubusercontent.com/DamirSvrtan/space-invaders.rb/master/assets/images/Ship.png');
+}
+
+.laser {
+  background-color: orange;
+  border-radius: 2px;
+}
+
+.explosao {
+  background-color: red;
+}
+
+
+
